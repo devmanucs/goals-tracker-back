@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  createdAt DateTime @default(now())
+
+  livros    Livro[]
+}
+
+model Livro {
+  id           String      @id @default(cuid())
+  usuario      Usuario     @relation(fields: [usuarioId], references: [id])
+  usuarioId    String
+  titulo       String
+  autor        String
+  totalPaginas Int
+  status       StatusLivro @default(QUERO_LER)
+  createdAt    DateTime    @default(now())
+
+  registros    RegistroLeitura[]
+}
+
+enum StatusLivro {
+  QUERO_LER
+  LENDO
+  LIDO
+  ABANDONADO
+}
+
+model RegistroLeitura {
+  id          String   @id @default(cuid())
+  livro       Livro    @relation(fields: [livroId], references: [id])
+  livroId     String
+  data        DateTime
+  paginaAtual Int
+  observacao  String?
+  createdAt   DateTime @default(now())
+}
