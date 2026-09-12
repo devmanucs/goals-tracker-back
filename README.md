@@ -68,6 +68,8 @@ Tudo exige `Authorization: Bearer <token>`, exceto `/auth/*` e `/health`.
 |---|---|
 | POST | `/auth/register` |
 | POST | `/auth/login` |
+| GET | `/auth/me` |
+| POST | `/auth/logout` |
 
 ### Leitura
 | Método | Rota |
@@ -101,10 +103,24 @@ Tudo exige `Authorization: Bearer <token>`, exceto `/auth/*` e `/health`.
 | GET | `/habitos/:id/streak` |
 | PATCH/DELETE | `/registros-habito/:id` |
 
-### Dashboard
+### Dashboard e retrospectiva
 | Método | Rota |
 |---|---|
 | GET | `/dashboard` |
+| GET | `/retrospectiva?meses=6` |
+
+## Logout
+
+JWT é stateless, então um logout que só responde 204 deixaria o token valendo
+pelos 7 dias restantes. Aqui o login assina o token com um `jti`, o logout grava
+esse `jti` na tabela `TokenRevogado` e o `authMiddleware` recusa qualquer token
+que esteja lá.
+
+Só o token da requisição é revogado — deslogar num dispositivo não derruba os
+outros. Tokens antigos, assinados antes do `jti` existir, não são revogáveis: em
+vez de fingir sucesso, o logout devolve 400 pedindo um login novo. Cada logout
+aproveita para apagar as revogações já vencidas, então a tabela não cresce sem
+limite e não precisa de job agendado.
 
 ## Formato de erro
 
@@ -124,10 +140,18 @@ Erros de validação incluem `code: "VALIDACAO"` e a lista `issues`:
 }
 ```
 
+## Testando pelo Bruno
+
+A pasta [`bruno/`](bruno/) é uma collection do [Bruno](https://www.usebruno.com/)
+com todas as rotas, versionada junto com o código. Abra a pasta no Bruno, escolha
+o ambiente **Local** e rode `01 Auth / Login` primeiro — ele salva o token e a
+collection inteira herda. Ver [bruno/README.md](bruno/README.md).
+
 ## Testes
 
 ```bash
-pnpm test
+pnpm test    # vitest
+pnpm smoke   # sobe o servidor de verdade e bate no /health
 ```
 
 - `tests/unit/` — funções puras (streak, progresso, páginas lidas, datas, enums).
@@ -137,3 +161,14 @@ pnpm test
 
 Os testes usam um banco próprio (`prisma/test.db`), recriado a cada execução pelo
 `tests/globalSetup.ts`. O `dev.db` nunca é tocado.
+
+O `pnpm smoke` cobre o que o typecheck não pega: que o processo realmente sobe,
+que o `/health` responde e que rota protegida exige token. Uma configuração
+quebrada do Prisma Client, por exemplo, só aparece aí.
+
+## CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em todo pull request:
+instala com lockfile travado, gera o Prisma Client, faz typecheck, **aplica as
+migrations num banco do zero** e confere que elas batem com o schema, roda os
+testes e o smoke.

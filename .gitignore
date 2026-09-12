@@ -15,3 +15,9 @@ prisma/smoke.db-journal
 # Banco usado pelo e2e local
 prisma/e2e.db
 prisma/e2e.db-journal
+
+# Banco usado pelo CI
+prisma/ci.db
+prisma/ci.db-journal
+prisma/smoke.db
+prisma/smoke.db-journal
