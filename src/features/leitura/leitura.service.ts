@@ -17,7 +17,15 @@ import { Livro, RegistroLeitura } from "../../../generated/prisma/client";
 // "YYYY-MM-DD" + enum lower_snake, que é o que o frontend consome.
 // ----------------------------------------------------------------------------
 
-export function serializarLivro(livro: Livro) {
+/** Livro com o último registro de leitura anexado pelo repository. */
+type LivroComUltimoRegistro = Livro & {
+  registros?: { paginaAtual: number; data: Date }[];
+};
+
+export function serializarLivro(livro: LivroComUltimoRegistro) {
+  const ultimo = livro.registros?.[0];
+  const paginaAtual = ultimo?.paginaAtual ?? 0;
+
   return {
     id: livro.id,
     titulo: livro.titulo,
@@ -26,6 +34,14 @@ export function serializarLivro(livro: Livro) {
     status: mapaStatusLivro.paraApi(livro.status),
     corCapa: livro.corCapa,
     createdAt: livro.createdAt.toISOString(),
+    // Derivados do último registro: o frontend monta a barra de progresso do
+    // card com isso, sem precisar buscar os registros de cada livro.
+    paginaAtual,
+    percentual:
+      livro.totalPaginas > 0
+        ? Math.min(100, Math.round((paginaAtual / livro.totalPaginas) * 100))
+        : 0,
+    ultimaLeitura: ultimo ? paraISO(ultimo.data) : null,
   };
 }
 
@@ -256,18 +272,6 @@ export const leituraService = {
     const [livro] = await leituraRepository.listarLivros(usuarioId, "LENDO");
     if (!livro) return null;
 
-    const registros = await leituraRepository.listarRegistrosDoLivro(livro.id);
-    const ultimo = registros.at(-1);
-    const paginaAtual = ultimo?.paginaAtual ?? 0;
-
-    return {
-      ...serializarLivro(livro),
-      paginaAtual,
-      percentual:
-        livro.totalPaginas > 0
-          ? Math.min(100, Math.round((paginaAtual / livro.totalPaginas) * 100))
-          : 0,
-      ultimaLeitura: ultimo ? paraISO(ultimo.data) : null,
-    };
+    return serializarLivro(livro);
   },
 };
