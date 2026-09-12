@@ -6,15 +6,24 @@ O frontend fica em [devmanucs/goals-tracker](https://github.com/devmanucs/goals-
 ## Rodando o projeto
 
 ```bash
-pnpm install
+pnpm install                  # já gera o Prisma Client (postinstall)
 cp .env.example .env          # e preencha JWT_SECRET
 pnpm prisma:migrate           # cria o dev.db e aplica as migrations
-pnpm prisma:generate          # gera o client em ./generated/prisma
 pnpm dev                      # http://localhost:3333
 ```
 
-O `dev.db` não é versionado: `pnpm prisma:migrate` cria o seu do zero a partir
-das migrations. O mesmo vale para `./generated/prisma`, daí o `prisma:generate`.
+Nem o `dev.db` nem o `./generated/prisma` são versionados — os dois são
+recriados a partir do que está no repositório.
+
+O Prisma Client é gerado automaticamente: no `postinstall` e também dentro de
+`dev`, `build`, `typecheck` e `test`. Isso é de propósito. Como a pasta
+`generated/` é ignorada pelo git, um `git pull` que traga schema novo deixaria o
+client velho no seu disco, e o typecheck falharia com dezenas de erros do tipo
+"Property 'concurso' does not exist" ou "has no exported member 'StatusTopico'" —
+que parecem erro de código, mas são só client desatualizado. Gerar custa ~150 ms;
+perder meia hora atrás desse erro custa mais.
+
+Se ainda assim aparecer: `pnpm prisma:generate`.
 
 ## Scripts
 
@@ -23,6 +32,7 @@ das migrations. O mesmo vale para `./generated/prisma`, daí o `prisma:generate`
 | `pnpm dev` | Servidor com hot reload (tsx watch) |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm test` | Suíte vitest (unit + integração) |
+| `pnpm smoke` | Sobe o servidor e bate no `/health` |
 | `pnpm test:watch` | Vitest em modo watch |
 | `pnpm prisma:migrate` | `prisma migrate dev` |
 | `pnpm prisma:generate` | Regenera o Prisma Client |
