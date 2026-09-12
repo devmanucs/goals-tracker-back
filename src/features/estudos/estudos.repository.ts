@@ -95,7 +95,9 @@ export const estudosRepository = {
           : {}),
       },
       orderBy: [{ dataAgendada: "asc" }, { peso: "desc" }],
-      include: { concurso: { select: { id: true, titulo: true } } },
+      include: {
+        concurso: { select: { id: true, titulo: true, dataProva: true } },
+      },
     });
   },
 

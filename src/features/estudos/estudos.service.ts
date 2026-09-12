@@ -297,9 +297,16 @@ export const estudosService = {
     const proximo = topicos.find((t) => !topicoConcluido(t.status));
     if (!proximo) return null;
 
+    const dataProva = paraISO(proximo.concurso.dataProva);
+
     return {
       ...serializarTopico(proximo),
-      concurso: proximo.concurso,
+      concurso: {
+        id: proximo.concurso.id,
+        titulo: proximo.concurso.titulo,
+        dataProva,
+        diasAteProva: diasEntre(hoje, dataProva),
+      },
       emQuantosDias: diasEntre(hoje, paraISO(proximo.dataAgendada)),
     };
   },
