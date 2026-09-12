@@ -17,6 +17,7 @@ import {
   livrosRoutes,
   registrosLeituraRoutes,
 } from "./features/leitura/leitura.routes";
+import { retrospectivaRoutes } from "./features/retrospectiva/retrospectiva.routes";
 import { errorHandler } from "./shared/middlewares/errorHandler";
 
 export const app: Express = express();
@@ -45,6 +46,7 @@ app.use("/habitos", habitosRoutes);
 app.use("/registros-habito", registrosHabitoRoutes);
 
 app.use("/dashboard", dashboardRoutes);
+app.use("/retrospectiva", retrospectivaRoutes);
 
 // Precisa ser o último middleware registrado.
 app.use(errorHandler);
