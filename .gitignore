@@ -3,3 +3,7 @@ node_modules
 .env
 
 /generated/prisma
+
+# Banco usado pelos testes (recriado a cada `pnpm test`)
+prisma/test.db
+prisma/test.db-journal

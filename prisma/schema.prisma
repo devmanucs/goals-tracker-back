@@ -20,19 +20,29 @@ model Usuario {
   createdAt DateTime @default(now())
 
   livros    Livro[]
+  concursos Concurso[]
+  habitos   Habito[]
 }
+
+// ----------------------------------------------------------------------------
+// Leitura
+// ----------------------------------------------------------------------------
 
 model Livro {
   id           String      @id @default(cuid())
-  usuario      Usuario     @relation(fields: [usuarioId], references: [id])
+  usuario      Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId    String
   titulo       String
   autor        String
   totalPaginas Int
   status       StatusLivro @default(QUERO_LER)
+  // Cor da capa usada pelos cards do frontend (ex: "var(--chart-3)").
+  corCapa      String?
   createdAt    DateTime    @default(now())
 
   registros    RegistroLeitura[]
+
+  @@index([usuarioId])
 }
 
 enum StatusLivro {
@@ -44,10 +54,102 @@ enum StatusLivro {
 
 model RegistroLeitura {
   id          String   @id @default(cuid())
-  livro       Livro    @relation(fields: [livroId], references: [id])
+  livro       Livro    @relation(fields: [livroId], references: [id], onDelete: Cascade)
   livroId     String
   data        DateTime
   paginaAtual Int
   observacao  String?
   createdAt   DateTime @default(now())
+
+  @@index([livroId])
+}
+
+// ----------------------------------------------------------------------------
+// Estudos (concursos)
+// ----------------------------------------------------------------------------
+
+model Concurso {
+  id        String         @id @default(cuid())
+  usuario   Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId String
+  titulo    String
+  banca     String
+  dataProva DateTime
+  status    StatusConcurso @default(PLANEJANDO)
+  createdAt DateTime       @default(now())
+
+  topicos   TopicoEstudo[]
+
+  @@index([usuarioId])
+}
+
+enum StatusConcurso {
+  PLANEJANDO
+  ESTUDANDO
+  ENCERRADO
+}
+
+model TopicoEstudo {
+  id           String       @id @default(cuid())
+  concurso     Concurso     @relation(fields: [concursoId], references: [id], onDelete: Cascade)
+  concursoId   String
+  titulo       String
+  materia      String
+  // Peso/prioridade do tópico no edital — quanto maior, mais importante.
+  peso         Int
+  dataAgendada DateTime
+  status       StatusTopico @default(PENDENTE)
+  createdAt    DateTime     @default(now())
+
+  @@index([concursoId])
+  @@index([dataAgendada])
+}
+
+enum StatusTopico {
+  PENDENTE
+  ESTUDANDO
+  ESTUDADO
+  REVISAO
+}
+
+// ----------------------------------------------------------------------------
+// Hábitos genéricos
+// ----------------------------------------------------------------------------
+
+model Habito {
+  id         String           @id @default(cuid())
+  usuario    Usuario          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId  String
+  nome       String
+  // Unidade do contador: "L", "km", "min", "vezes"...
+  unidade    String
+  frequencia FrequenciaHabito @default(DIARIA)
+  // Valor-meta por período vigente (ex: 2 L por dia).
+  metaValor  Float
+  // Ícone escolhido no frontend (water | run | meditation | sleep).
+  icone      String?
+  createdAt  DateTime         @default(now())
+
+  registros  RegistroHabito[]
+
+  @@index([usuarioId])
+}
+
+enum FrequenciaHabito {
+  DIARIA
+  SEMANAL
+  MENSAL
+}
+
+model RegistroHabito {
+  id        String   @id @default(cuid())
+  habito    Habito   @relation(fields: [habitoId], references: [id], onDelete: Cascade)
+  habitoId  String
+  data      DateTime
+  valor     Float
+  createdAt DateTime @default(now())
+
+  // Vários registros no mesmo dia são permitidos e somam entre si — o front
+  // registra incrementos ("agora bebi mais 0.5 L"), não um total diário único.
+  @@index([habitoId])
 }
