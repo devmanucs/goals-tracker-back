@@ -77,8 +77,28 @@ export const habitosService = {
     return habito;
   },
 
-  async obterHabito(id: string, usuarioId: string) {
-    return serializarHabito(await this.buscarHabito(id, usuarioId));
+  /**
+   * Devolve o hábito no mesmo formato da listagem — com progresso, streak e
+   * registros recentes. A tela de detalhe usa exatamente os mesmos campos que o
+   * card, então deixar as duas respostas diferentes só cria armadilha.
+   */
+  async obterHabito(id: string, usuarioId: string, hoje = hojeISO()) {
+    const habito = await this.buscarHabito(id, usuarioId);
+    const registros = paraCalculo(
+      await habitosRepository.listarRegistrosDoHabito(habito.id),
+    );
+
+    return {
+      ...serializarHabito(habito),
+      progresso: progressoPeriodoAtual(
+        registros,
+        habito.frequencia,
+        habito.metaValor,
+        hoje,
+      ),
+      streak: calcularStreak(registros, habito.frequencia, habito.metaValor, hoje),
+      registrosRecentes: registros.filter((r) => r.data >= somarDias(hoje, -DIAS_RECENTES)),
+    };
   },
 
   async criarHabito(usuarioId: string, dados: CriarHabitoInput) {

@@ -294,3 +294,19 @@ describe("listagem com progresso, streak e registros recentes", () => {
     expect(resposta.body[0].registrosRecentes).toEqual([]);
   });
 });
+
+describe("detalhe do hábito", () => {
+  it("devolve os mesmos derivados da listagem", async () => {
+    const habito = await criarHabito(ana, { metaValor: 2 });
+    await registrar(ana, habito.id, hoje(), 2.5);
+
+    const resposta = await request(app)
+      .get(`/habitos/${habito.id}`)
+      .set(...ana.auth);
+
+    expect(resposta.status).toBe(200);
+    expect(resposta.body.progresso).toMatchObject({ atual: 2.5, batido: true });
+    expect(resposta.body.streak).toMatchObject({ atual: 1 });
+    expect(resposta.body.registrosRecentes).toHaveLength(1);
+  });
+});
