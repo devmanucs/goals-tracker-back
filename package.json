@@ -5,6 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "postinstall": "prisma generate",
+    "load": "pnpm install && pnpm exec prisma migrate deploy && pnpm build && pnpm dev",
     "dev": "prisma generate && tsx watch src/server.ts",
     "build": "prisma generate && tsc --noEmit",
     "typecheck": "prisma generate && tsc --noEmit",

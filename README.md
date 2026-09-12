@@ -6,11 +6,20 @@ O frontend fica em [devmanucs/goals-tracker](https://github.com/devmanucs/goals-
 ## Rodando o projeto
 
 ```bash
-pnpm install                  # já gera o Prisma Client (postinstall)
 cp .env.example .env          # e preencha JWT_SECRET
-pnpm prisma:migrate           # cria o dev.db e aplica as migrations
-pnpm dev                      # http://localhost:3333
+pnpm load                     # http://localhost:3333
 ```
+
+`pnpm load` faz tudo: instala, gera o Prisma Client, aplica as migrations,
+typecheca e sobe o servidor. Serve tanto no primeiro clone quanto depois de um
+`git pull` — usa `migrate deploy`, que é idempotente e não pergunta nada.
+
+O passo das migrations não é enfeite: sem ele o servidor sobe e o `/health`
+responde `ok`, mas qualquer rota que toque no banco devolve 500, porque o SQLite
+cria o arquivo vazio ao conectar e não há tabela nenhuma — uma falha que parece
+"está rodando" e só aparece no primeiro cadastro.
+
+Para o dia a dia, `pnpm dev` sozinho basta.
 
 Nem o `dev.db` nem o `./generated/prisma` são versionados — os dois são
 recriados a partir do que está no repositório.
@@ -25,10 +34,25 @@ perder meia hora atrás desse erro custa mais.
 
 Se ainda assim aparecer: `pnpm prisma:generate`.
 
+### `pnpm load` não cria o banco
+
+`load` é `install` + `build` + `dev`. Ele resolve dependências e client, mas **não
+aplica migrations** — então num clone novo, ou depois de um `git pull` que traga
+migration nova, rode antes:
+
+```bash
+pnpm prisma:migrate
+```
+
+Sem isso o servidor sobe e o `/health` responde `ok`, mas qualquer rota que toque
+no banco devolve 500 — o SQLite cria o arquivo vazio ao conectar, sem nenhuma
+tabela. É uma falha que parece "está rodando" e só aparece no primeiro cadastro.
+
 ## Scripts
 
 | Script | O que faz |
 |---|---|
+| `pnpm load` | `install` + `build` + `dev`, em sequência |
 | `pnpm dev` | Servidor com hot reload (tsx watch) |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm test` | Suíte vitest (unit + integração) |
