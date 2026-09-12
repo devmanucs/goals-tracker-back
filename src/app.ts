@@ -1,4 +1,6 @@
-import "dotenv/config";
+// Primeiro import de propósito: valida o ambiente antes de qualquer módulo
+// que dependa dele ser avaliado.
+import "./shared/config/env";
 import cors from "cors";
 import express, { Express } from "express";
 import { authRoutes } from "./features/auth/auth.routes";

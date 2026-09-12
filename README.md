@@ -10,6 +10,11 @@ cp .env.example .env          # e preencha JWT_SECRET
 pnpm load                     # http://localhost:3333
 ```
 
+O `.env` não é opcional: o servidor valida a configuração no boot e recusa
+iniciar se faltar alguma variável, dizendo qual. Antes ele subia sem `JWT_SECRET`
+e só quebrava no primeiro login, com um "secretOrPrivateKey must have a value"
+vindo de dentro do jsonwebtoken.
+
 `pnpm load` faz tudo: instala, gera o Prisma Client, aplica as migrations,
 typecheca e sobe o servidor. Serve tanto no primeiro clone quanto depois de um
 `git pull` — usa `migrate deploy`, que é idempotente e não pergunta nada.
