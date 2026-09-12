@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "smoke": "tsx scripts/smoke.ts"
   },
   "repository": {
     "type": "git",
@@ -54,5 +55,6 @@
       "esbuild",
       "prisma"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

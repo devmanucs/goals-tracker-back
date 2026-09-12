@@ -1,0 +1,17 @@
+meta {
+  name: Atualizar registro
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/registros-leitura/{{registroLeituraId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "paginaAtual": 400
+  }
+}

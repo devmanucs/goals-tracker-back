@@ -1,0 +1,15 @@
+meta {
+  name: Deletar livro
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/livros/{{livroId}}
+  body: none
+  auth: inherit
+}
+
+docs {
+  Remove os registros do livro em cascata. Responde 204.
+}

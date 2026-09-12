@@ -1,0 +1,27 @@
+meta {
+  name: Criar registro de leitura
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/livros/{{livroId}}/registros
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": "2026-08-13",
+    "paginaAtual": 344,
+    "observacao": "Metade do livro."
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("registroLeituraId", res.body.id);
+}
+
+docs {
+  data no formato YYYY-MM-DD. paginaAtual maior que o total do livro devolve 400.
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Listar topicos
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/concursos/{{concursoId}}/topicos
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~ordenarPor: peso
+  ~status: pendente
+}
+
+docs {
+  ordenarPor: peso (maior primeiro) ou data (padrao).
+}

@@ -1,6 +1,15 @@
 import { prisma } from "../../shared/lib/prisma";
 import { StatusConcurso, StatusTopico } from "../../../generated/prisma/enums";
 
+/**
+ * Todo concurso devolvido pela API carrega o progresso dos seus tópicos. Buscar
+ * o status deles junto evita o frontend fazer uma requisição por concurso só
+ * para montar a barra de progresso do card.
+ */
+const COM_STATUS_DOS_TOPICOS = {
+  topicos: { select: { status: true } },
+} as const;
+
 /** Só queries Prisma — a validação de posse fica no service. */
 export const estudosRepository = {
   // --------------------------------------------------------------------------
@@ -11,11 +20,15 @@ export const estudosRepository = {
     return prisma.concurso.findMany({
       where: { usuarioId },
       orderBy: { dataProva: "asc" },
+      include: COM_STATUS_DOS_TOPICOS,
     });
   },
 
   buscarConcursoPorId(id: string, usuarioId: string) {
-    return prisma.concurso.findFirst({ where: { id, usuarioId } });
+    return prisma.concurso.findFirst({
+      where: { id, usuarioId },
+      include: COM_STATUS_DOS_TOPICOS,
+    });
   },
 
   criarConcurso(data: {
@@ -82,7 +95,9 @@ export const estudosRepository = {
           : {}),
       },
       orderBy: [{ dataAgendada: "asc" }, { peso: "desc" }],
-      include: { concurso: { select: { id: true, titulo: true } } },
+      include: {
+        concurso: { select: { id: true, titulo: true, dataProva: true } },
+      },
     });
   },
 

@@ -1,0 +1,17 @@
+meta {
+  name: Atualizar topico
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/topicos/{{topicoId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status": "estudado"
+  }
+}

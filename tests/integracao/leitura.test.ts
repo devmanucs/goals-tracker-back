@@ -304,3 +304,49 @@ describe("GET /leitura/estatisticas", () => {
     expect(resposta.body.paginasLidasTotal).toBe(0);
   });
 });
+
+describe("página atual embutida no livro", () => {
+  it("vem zerada em livro sem registro", async () => {
+    const livro = await criarLivro(ana);
+    expect(livro).toMatchObject({ paginaAtual: 0, percentual: 0, ultimaLeitura: null });
+  });
+
+  it("reflete o registro mais recente, não o primeiro", async () => {
+    const livro = await criarLivro(ana, { totalPaginas: 688 });
+
+    for (const registro of [
+      { data: "2026-08-02", paginaAtual: 20 },
+      { data: "2026-08-09", paginaAtual: 344 },
+      { data: "2026-08-05", paginaAtual: 100 },
+    ]) {
+      await request(app)
+        .post(`/livros/${livro.id}/registros`)
+        .set(...ana.auth)
+        .send(registro);
+    }
+
+    const resposta = await request(app)
+      .get(`/livros/${livro.id}`)
+      .set(...ana.auth);
+
+    expect(resposta.body).toMatchObject({
+      paginaAtual: 344,
+      percentual: 50,
+      ultimaLeitura: "2026-08-09",
+    });
+  });
+
+  it("aparece também na listagem, sem precisar de uma busca por livro", async () => {
+    const livro = await criarLivro(ana, { totalPaginas: 100 });
+    await request(app)
+      .post(`/livros/${livro.id}/registros`)
+      .set(...ana.auth)
+      .send({ data: "2026-08-13", paginaAtual: 25 });
+
+    const resposta = await request(app)
+      .get("/livros")
+      .set(...ana.auth);
+
+    expect(resposta.body[0]).toMatchObject({ paginaAtual: 25, percentual: 25 });
+  });
+});

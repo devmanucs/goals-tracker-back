@@ -7,3 +7,17 @@ node_modules
 # Banco usado pelos testes (recriado a cada `pnpm test`)
 prisma/test.db
 prisma/test.db-journal
+
+# Banco usado em smoke test manual
+prisma/smoke.db
+prisma/smoke.db-journal
+
+# Banco usado pelo e2e local
+prisma/e2e.db
+prisma/e2e.db-journal
+
+# Banco usado pelo CI
+prisma/ci.db
+prisma/ci.db-journal
+prisma/smoke.db
+prisma/smoke.db-journal

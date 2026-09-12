@@ -17,14 +17,30 @@ import { Concurso, TopicoEstudo } from "../../../generated/prisma/client";
 // Serialização
 // ----------------------------------------------------------------------------
 
-export function serializarConcurso(concurso: Concurso) {
+/** Concurso com o status dos tópicos anexado pelo repository. */
+type ConcursoComTopicos = Concurso & {
+  topicos?: { status: string }[];
+};
+
+export function serializarConcurso(concurso: ConcursoComTopicos) {
+  const topicos = concurso.topicos ?? [];
+  const dataProva = paraISO(concurso.dataProva);
+
   return {
     id: concurso.id,
     titulo: concurso.titulo,
     banca: concurso.banca,
-    dataProva: paraISO(concurso.dataProva),
+    dataProva,
     status: mapaStatusConcurso.paraApi(concurso.status),
     createdAt: concurso.createdAt.toISOString(),
+    // Derivados: o card do frontend monta a barra de progresso e a contagem
+    // regressiva com isso, sem uma requisição por concurso.
+    progresso: {
+      total: topicos.length,
+      concluidos: topicos.filter((t) => topicoConcluido(t.status)).length,
+      percentual: calcularProgresso(topicos),
+    },
+    diasAteProva: diasEntre(hojeISO(), dataProva),
   };
 }
 
@@ -281,9 +297,16 @@ export const estudosService = {
     const proximo = topicos.find((t) => !topicoConcluido(t.status));
     if (!proximo) return null;
 
+    const dataProva = paraISO(proximo.concurso.dataProva);
+
     return {
       ...serializarTopico(proximo),
-      concurso: proximo.concurso,
+      concurso: {
+        id: proximo.concurso.id,
+        titulo: proximo.concurso.titulo,
+        dataProva,
+        diasAteProva: diasEntre(hoje, dataProva),
+      },
       emQuantosDias: diasEntre(hoje, paraISO(proximo.dataAgendada)),
     };
   },

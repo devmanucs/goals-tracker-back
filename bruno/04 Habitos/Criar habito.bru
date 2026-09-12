@@ -1,0 +1,29 @@
+meta {
+  name: Criar habito
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/habitos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nome": "Beber agua",
+    "unidade": "L",
+    "frequencia": "diaria",
+    "metaValor": 2,
+    "icone": "water"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("habitoId", res.body.id);
+}
+
+docs {
+  frequencia: diaria | semanal | mensal. metaValor e o alvo do periodo.
+}

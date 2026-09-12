@@ -1,5 +1,8 @@
 import { AppError } from "../../shared/errors/AppErrors";
-import { hojeISO, paraData, paraISO } from "../../shared/utils/datas";
+import { hojeISO, paraData, paraISO, somarDias } from "../../shared/utils/datas";
+
+/** Quantos dias de registro a listagem devolve junto de cada hábito. */
+const DIAS_RECENTES = 90;
 import {
   calcularStreak,
   progressoPeriodoAtual,
@@ -55,9 +58,14 @@ export const habitosService = {
   // Hábitos
   // --------------------------------------------------------------------------
 
-  async listarHabitos(usuarioId: string) {
-    const habitos = await habitosRepository.listarHabitos(usuarioId);
-    return habitos.map(serializarHabito);
+  /**
+   * Lista os hábitos já com progresso, streak e os registros recentes.
+   *
+   * O card do frontend precisa dos três para desenhar barra, chama e heatmap —
+   * devolver tudo junto evita três requisições por hábito na tela de listagem.
+   */
+  async listarHabitos(usuarioId: string, hoje = hojeISO()) {
+    return this.resumo(usuarioId, hoje);
   },
 
   /** 404 (e não 403) quando o hábito é de outro usuário: não confirma o id. */
@@ -69,8 +77,28 @@ export const habitosService = {
     return habito;
   },
 
-  async obterHabito(id: string, usuarioId: string) {
-    return serializarHabito(await this.buscarHabito(id, usuarioId));
+  /**
+   * Devolve o hábito no mesmo formato da listagem — com progresso, streak e
+   * registros recentes. A tela de detalhe usa exatamente os mesmos campos que o
+   * card, então deixar as duas respostas diferentes só cria armadilha.
+   */
+  async obterHabito(id: string, usuarioId: string, hoje = hojeISO()) {
+    const habito = await this.buscarHabito(id, usuarioId);
+    const registros = paraCalculo(
+      await habitosRepository.listarRegistrosDoHabito(habito.id),
+    );
+
+    return {
+      ...serializarHabito(habito),
+      progresso: progressoPeriodoAtual(
+        registros,
+        habito.frequencia,
+        habito.metaValor,
+        hoje,
+      ),
+      streak: calcularStreak(registros, habito.frequencia, habito.metaValor, hoje),
+      registrosRecentes: registros.filter((r) => r.data >= somarDias(hoje, -DIAS_RECENTES)),
+    };
   },
 
   async criarHabito(usuarioId: string, dados: CriarHabitoInput) {
@@ -210,10 +238,14 @@ export const habitosService = {
 
   /**
    * Resumo de todos os hábitos do usuário com streak e progresso já calculados.
-   * É o que o dashboard consome — evita o frontend fazer N+1 requisições.
+   * É o que o dashboard e a listagem consomem — evita o frontend fazer N+1
+   * requisições.
    */
   async resumo(usuarioId: string, hoje = hojeISO()) {
     const habitos = await habitosRepository.listarHabitos(usuarioId);
+
+    // Janela do heatmap do frontend (12 semanas, com folga para a semana atual).
+    const inicioRecentes = somarDias(hoje, -DIAS_RECENTES);
 
     return Promise.all(
       habitos.map(async (habito) => {
@@ -230,6 +262,9 @@ export const habitosService = {
             hoje,
           ),
           streak: calcularStreak(registros, habito.frequencia, habito.metaValor, hoje),
+          // Recorte, e não o histórico inteiro: a listagem não pode crescer sem
+          // limite conforme a conta envelhece.
+          registrosRecentes: registros.filter((r) => r.data >= inicioRecentes),
         };
       }),
     );

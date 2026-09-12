@@ -1,0 +1,11 @@
+meta {
+  name: Listar registros do livro
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/livros/{{livroId}}/registros
+  body: none
+  auth: inherit
+}

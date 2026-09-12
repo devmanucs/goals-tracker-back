@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Permite rodar na mão pela aba Actions.
+  workflow_dispatch:
+
+# Um push novo na mesma branch cancela a execução anterior.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Typecheck, testes e smoke
+    runs-on: ubuntu-latest
+
+    env:
+      # O prisma.config.ts lê estas variáveis; os testes usam banco próprio.
+      DATABASE_URL: file:./prisma/ci.db
+      JWT_SECRET: segredo-de-ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # A versão vem do campo packageManager do package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      # O Prisma Client é gerado em ./generated/prisma, que não é versionado —
+      # sem este passo nada compila.
+      - name: Gerar Prisma Client
+        run: pnpm prisma:generate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # As migrations precisam aplicar limpo num banco do zero. Pega migration
+      # esquecida ou fora de sincronia com o schema.
+      - name: Aplicar migrations num banco limpo
+        run: pnpm exec prisma migrate deploy
+
+      - name: Verificar que o schema bate com as migrations
+        run: pnpm exec prisma migrate status
+
+      - name: Testes
+        run: pnpm test
+
+      # O typecheck não garante que o processo sobe: sobe de verdade e bate no
+      # /health, além de conferir que rota protegida exige token.
+      - name: Smoke do servidor
+        run: pnpm smoke

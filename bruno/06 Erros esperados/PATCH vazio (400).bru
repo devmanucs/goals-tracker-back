@@ -1,0 +1,15 @@
+meta {
+  name: PATCH vazio (400)
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/livros/{{livroId}}
+  body: none
+  auth: inherit
+}
+
+docs {
+  Corpo vazio e recusado: informe ao menos um campo.
+}

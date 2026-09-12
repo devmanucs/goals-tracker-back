@@ -1,0 +1,29 @@
+meta {
+  name: Criar livro
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/livros
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titulo": "Duna",
+    "autor": "Frank Herbert",
+    "totalPaginas": 688,
+    "status": "lendo",
+    "corCapa": "var(--chart-1)"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("livroId", res.body.id);
+}
+
+docs {
+  Salva o id em {{livroId}} para as requisicoes seguintes.
+}

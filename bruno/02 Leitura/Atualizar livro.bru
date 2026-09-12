@@ -1,0 +1,21 @@
+meta {
+  name: Atualizar livro
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/livros/{{livroId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status": "lido"
+  }
+}
+
+docs {
+  Todos os campos sao opcionais, mas o corpo nao pode vir vazio (400).
+}

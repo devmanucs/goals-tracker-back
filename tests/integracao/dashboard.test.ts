@@ -38,7 +38,7 @@ describe("GET /dashboard", () => {
     expect(resposta.body).toMatchObject({
       leitura: { livroAtual: null, livrosLidos: 0 },
       estudos: { proximoTopico: null, concursosAtivos: 0 },
-      habitos: { total: 0, streaksAtivos: [], metasBatidasNoPeriodo: 0 },
+      habitos: { total: 0, lista: [], comStreakAtivo: 0, metasBatidasNoPeriodo: 0 },
     });
   });
 
@@ -97,10 +97,10 @@ describe("GET /dashboard", () => {
     });
     expect(resposta.body.estudos.concursosAtivos).toBe(1);
 
-    expect(resposta.body.habitos.streaksAtivos).toHaveLength(1);
-    expect(resposta.body.habitos.streaksAtivos[0]).toMatchObject({
+    expect(resposta.body.habitos.comStreakAtivo).toBe(1);
+    expect(resposta.body.habitos.lista[0]).toMatchObject({
       nome: "Beber água",
-      streak: 2,
+      streak: { atual: 2 },
     });
     expect(resposta.body.habitos.metasBatidasNoPeriodo).toBe(1);
   });
@@ -118,7 +118,7 @@ describe("GET /dashboard", () => {
     expect(resposta.body.leitura.livroAtual).toBeNull();
   });
 
-  it("omite hábitos sem streak da lista de streaks ativos", async () => {
+  it("não conta como streak ativo um hábito sem registro", async () => {
     await request(app)
       .post("/habitos")
       .set(...ana.auth)
@@ -129,6 +129,7 @@ describe("GET /dashboard", () => {
       .set(...ana.auth);
 
     expect(resposta.body.habitos.total).toBe(1);
-    expect(resposta.body.habitos.streaksAtivos).toEqual([]);
+    expect(resposta.body.habitos.comStreakAtivo).toBe(0);
+    expect(resposta.body.habitos.lista).toHaveLength(1);
   });
 });

@@ -1,0 +1,11 @@
+meta {
+  name: Detalhe do concurso
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/concursos/{{concursoId}}
+  body: none
+  auth: inherit
+}

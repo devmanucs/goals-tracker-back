@@ -1,0 +1,23 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nome": "Manuella",
+    "email": "manu@teste.com",
+    "senha": "senha123"
+  }
+}
+
+docs {
+  Cria a conta e devolve { id, nome, email }. NAO devolve token: rode o Login em seguida.
+}

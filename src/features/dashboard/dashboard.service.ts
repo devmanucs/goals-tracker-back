@@ -19,20 +19,9 @@ export const dashboardService = {
         leituraService.estatisticas(usuarioId, {}),
       ]);
 
-    // "Ativo" = o hábito vem de pelo menos um período consecutivo batido.
-    const streaksAtivos = habitos
-      .filter((habito) => habito.streak.atual > 0)
-      .map((habito) => ({
-        habitoId: habito.id,
-        nome: habito.nome,
-        unidade: habito.unidade,
-        frequencia: habito.frequencia,
-        icone: habito.icone,
-        streak: habito.streak.atual,
-        recorde: habito.streak.recorde,
-        progresso: habito.progresso,
-      }))
-      .sort((a, b) => b.streak - a.streak);
+    // A lista vem inteira, ordenada pelo streak: o card do dashboard mostra
+    // todos os hábitos com sua barra, e "streaks ativos" é só uma contagem.
+    const lista = [...habitos].sort((a, b) => b.streak.atual - a.streak.atual);
 
     return {
       leitura: {
@@ -47,7 +36,9 @@ export const dashboardService = {
       },
       habitos: {
         total: habitos.length,
-        streaksAtivos,
+        lista,
+        // "Ativo" = o hábito vem de pelo menos um período consecutivo batido.
+        comStreakAtivo: habitos.filter((h) => h.streak.atual > 0).length,
         // Quantos hábitos já bateram a meta do período vigente.
         metasBatidasNoPeriodo: habitos.filter((h) => h.progresso.batido).length,
       },

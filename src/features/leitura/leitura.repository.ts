@@ -2,6 +2,19 @@ import { prisma } from "../../shared/lib/prisma";
 import { StatusLivro } from "../../../generated/prisma/enums";
 
 /**
+ * Todo livro devolvido pela API carrega a página atual, que é a do registro de
+ * leitura mais recente. Buscar isso junto evita o frontend fazer uma requisição
+ * por livro só para montar a barra de progresso do card.
+ */
+const COM_ULTIMO_REGISTRO = {
+  registros: {
+    orderBy: { data: "desc" },
+    take: 1,
+    select: { paginaAtual: true, data: true },
+  },
+} as const;
+
+/**
  * Só queries Prisma — nenhuma regra de negócio aqui.
  * Todas as buscas de livro recebem `usuarioId` e filtram por ele: é assim que o
  * isolamento multiusuário é garantido na camada mais baixa.
@@ -15,12 +28,14 @@ export const leituraRepository = {
     return prisma.livro.findMany({
       where: status ? { usuarioId, status } : { usuarioId },
       orderBy: { createdAt: "desc" },
+      include: COM_ULTIMO_REGISTRO,
     });
   },
 
   buscarLivroPorId(id: string, usuarioId: string) {
     return prisma.livro.findFirst({
       where: { id, usuarioId },
+      include: COM_ULTIMO_REGISTRO,
     });
   },
 

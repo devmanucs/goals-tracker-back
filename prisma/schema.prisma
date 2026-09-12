@@ -19,9 +19,30 @@ model Usuario {
   senha     String
   createdAt DateTime @default(now())
 
-  livros    Livro[]
-  concursos Concurso[]
-  habitos   Habito[]
+  livros         Livro[]
+  concursos      Concurso[]
+  habitos        Habito[]
+  tokensRevogados TokenRevogado[]
+}
+
+/// Lista de bloqueio dos tokens invalidados por logout.
+///
+/// JWT é stateless: sem isso, `POST /auth/logout` não passaria de uma resposta
+/// 204 enquanto o token continuaria válido até expirar. Cada token assinado
+/// carrega um `jti` (id único); o logout grava esse jti aqui e o authMiddleware
+/// passa a recusá-lo.
+///
+/// `expiraEm` é o `exp` do próprio token: depois dessa data a linha não serve
+/// mais para nada e é apagada (ver limparExpirados no repository).
+model TokenRevogado {
+  jti       String   @id
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId String
+  expiraEm  DateTime
+  createdAt DateTime @default(now())
+
+  @@index([usuarioId])
+  @@index([expiraEm])
 }
 
 // ----------------------------------------------------------------------------

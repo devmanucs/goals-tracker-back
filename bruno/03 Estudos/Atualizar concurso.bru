@@ -1,0 +1,17 @@
+meta {
+  name: Atualizar concurso
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/concursos/{{concursoId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "status": "encerrado"
+  }
+}

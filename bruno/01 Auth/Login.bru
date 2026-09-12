@@ -1,0 +1,27 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "manu@teste.com",
+    "senha": "senha123"
+  }
+}
+
+script:post-response {
+  // Guarda o token no ambiente: todas as outras requisicoes herdam dele.
+  bru.setEnvVar("token", res.body.token);
+}
+
+docs {
+  RODE ESTE PRIMEIRO. O script de pos-resposta salva o token na variavel {{token}}, que a collection inteira usa como Bearer.
+}

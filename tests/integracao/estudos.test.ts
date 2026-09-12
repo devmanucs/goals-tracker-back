@@ -295,3 +295,32 @@ describe("derivados", () => {
     expect(resposta.body).toBeNull();
   });
 });
+
+describe("progresso embutido no concurso", () => {
+  it("vem zerado em concurso sem tópico", async () => {
+    const concurso = await criarConcurso(ana);
+    expect(concurso.progresso).toEqual({ total: 0, concluidos: 0, percentual: 0 });
+  });
+
+  it("conta estudado e revisão, na listagem e no detalhe", async () => {
+    const concurso = await criarConcurso(ana);
+    await criarTopico(ana, concurso.id, { titulo: "1", status: "estudado" });
+    await criarTopico(ana, concurso.id, { titulo: "2", status: "revisao" });
+    await criarTopico(ana, concurso.id, { titulo: "3", status: "pendente" });
+
+    const detalhe = await request(app)
+      .get(`/concursos/${concurso.id}`)
+      .set(...ana.auth);
+    expect(detalhe.body.progresso).toEqual({ total: 3, concluidos: 2, percentual: 67 });
+
+    const lista = await request(app)
+      .get("/concursos")
+      .set(...ana.auth);
+    expect(lista.body[0].progresso.percentual).toBe(67);
+  });
+
+  it("traz os dias até a prova junto", async () => {
+    const concurso = await criarConcurso(ana, { dataProva: "2026-11-22" });
+    expect(typeof concurso.diasAteProva).toBe("number");
+  });
+});

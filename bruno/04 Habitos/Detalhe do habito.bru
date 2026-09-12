@@ -1,0 +1,11 @@
+meta {
+  name: Detalhe do habito
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/habitos/{{habitoId}}
+  body: none
+  auth: inherit
+}

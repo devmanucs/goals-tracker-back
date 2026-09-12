@@ -1,0 +1,17 @@
+meta {
+  name: Atualizar registro
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/registros-habito/{{registroHabitoId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "valor": 2.2
+  }
+}

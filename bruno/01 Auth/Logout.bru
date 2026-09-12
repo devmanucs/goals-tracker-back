@@ -1,0 +1,15 @@
+meta {
+  name: Logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/auth/logout
+  body: none
+  auth: inherit
+}
+
+docs {
+  Revoga de verdade o token usado (204). Depois disso, qualquer requisicao com ele devolve 401 - rode o Login de novo. Nao derruba os outros dispositivos.
+}

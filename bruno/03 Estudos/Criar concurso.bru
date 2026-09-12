@@ -1,0 +1,28 @@
+meta {
+  name: Criar concurso
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/concursos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titulo": "Analista Judiciario - TRT",
+    "banca": "FGV",
+    "dataProva": "2026-11-22",
+    "status": "estudando"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("concursoId", res.body.id);
+}
+
+docs {
+  status: planejando | estudando | encerrado.
+}

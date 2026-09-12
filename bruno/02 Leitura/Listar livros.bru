@@ -1,0 +1,19 @@
+meta {
+  name: Listar livros
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/livros
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~status: lendo
+}
+
+docs {
+  Habilite o parametro status para filtrar: quero_ler | lendo | lido | abandonado.
+}
