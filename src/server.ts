@@ -1,7 +1,6 @@
 import { app } from "./app";
+import { env } from "./shared/config/env";
 
-const PORT = Number(process.env.PORT ?? 3333);
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+app.listen(env.PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${env.PORT}`);
 });

@@ -4,8 +4,7 @@ import { AppError } from "../../shared/errors/AppErrors";
 import jwt from "jsonwebtoken"
 import { authRepository } from "./auth.repository";
 import { LoginInput, RegisterInput } from "./auth.schema";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { env } from "../../shared/config/env";
 
 export const authService = {
   async register({ nome, email, senha }: RegisterInput) {
@@ -37,7 +36,7 @@ export const authService = {
 
     // O jwtid (jti) é o que torna o logout possível: é por ele que o token
     // entra na lista de revogados.
-    const token = jwt.sign({ usuarioId: usuario.id }, JWT_SECRET as string, {
+    const token = jwt.sign({ usuarioId: usuario.id }, env.JWT_SECRET, {
       expiresIn: "7d",
       jwtid: randomUUID(),
     });

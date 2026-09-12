@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { authRepository } from "../../features/auth/auth.repository";
 import { AppError } from "../errors/AppErrors";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { env } from "../config/env";
 
 /** Dados do token já validado, anexados à request. */
 export interface TokenAutenticado {
@@ -54,7 +53,7 @@ export async function authMiddleware(
 
   let payload: TokenPayload;
   try {
-    payload = jwt.verify(token, JWT_SECRET as string) as TokenPayload;
+    payload = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
   } catch {
     return next(new AppError("Token inválido ou expirado", 401));
   }
