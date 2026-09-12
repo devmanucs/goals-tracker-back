@@ -250,3 +250,47 @@ describe("streak", () => {
     expect(resposta.status).toBe(404);
   });
 });
+
+describe("listagem com progresso, streak e registros recentes", () => {
+  it("devolve os três derivados junto de cada hábito", async () => {
+    const habito = await criarHabito(ana, { metaValor: 2 });
+    await registrar(ana, habito.id, diasAtras(1), 2.5);
+    await registrar(ana, habito.id, hoje(), 2.5);
+
+    const resposta = await request(app)
+      .get("/habitos")
+      .set(...ana.auth);
+
+    expect(resposta.status).toBe(200);
+    expect(resposta.body[0]).toMatchObject({
+      nome: "Beber água",
+      progresso: { atual: 2.5, meta: 2, batido: true },
+      streak: { atual: 2, periodoAtualBatido: true },
+    });
+    expect(resposta.body[0].registrosRecentes).toHaveLength(2);
+  });
+
+  it("recorta os registros recentes em 90 dias", async () => {
+    const habito = await criarHabito(ana);
+    await registrar(ana, habito.id, diasAtras(200), 1);
+    await registrar(ana, habito.id, hoje(), 1);
+
+    const resposta = await request(app)
+      .get("/habitos")
+      .set(...ana.auth);
+
+    expect(resposta.body[0].registrosRecentes).toHaveLength(1);
+    expect(resposta.body[0].registrosRecentes[0].data).toBe(hoje());
+  });
+
+  it("hábito sem registro vem com streak zero e lista vazia", async () => {
+    await criarHabito(ana);
+
+    const resposta = await request(app)
+      .get("/habitos")
+      .set(...ana.auth);
+
+    expect(resposta.body[0].streak.atual).toBe(0);
+    expect(resposta.body[0].registrosRecentes).toEqual([]);
+  });
+});
