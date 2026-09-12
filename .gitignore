@@ -4,20 +4,24 @@ node_modules
 
 /generated/prisma
 
-# Banco usado pelos testes (recriado a cada `pnpm test`)
+# Bancos SQLite — nenhum é versionado.
+#
+# O dev.db sai do controle de versão de propósito: ele muda a cada migration,
+# o diff é binário e não carrega nada que valha revisar. Quem clona o projeto
+# cria o seu com `pnpm prisma:migrate`, que aplica as migrations do zero.
+dev.db
+dev.db-journal
+
+# Recriado a cada `pnpm test`
 prisma/test.db
 prisma/test.db-journal
 
-# Banco usado em smoke test manual
+# `pnpm smoke` e o passo equivalente no CI
 prisma/smoke.db
 prisma/smoke.db-journal
 
-# Banco usado pelo e2e local
+# Usados pelo e2e local e pelo CI
 prisma/e2e.db
 prisma/e2e.db-journal
-
-# Banco usado pelo CI
 prisma/ci.db
 prisma/ci.db-journal
-prisma/smoke.db
-prisma/smoke.db-journal

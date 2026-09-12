@@ -8,10 +8,13 @@ O frontend fica em [devmanucs/goals-tracker](https://github.com/devmanucs/goals-
 ```bash
 pnpm install
 cp .env.example .env          # e preencha JWT_SECRET
-pnpm prisma:migrate           # aplica as migrations no dev.db
+pnpm prisma:migrate           # cria o dev.db e aplica as migrations
 pnpm prisma:generate          # gera o client em ./generated/prisma
 pnpm dev                      # http://localhost:3333
 ```
+
+O `dev.db` não é versionado: `pnpm prisma:migrate` cria o seu do zero a partir
+das migrations. O mesmo vale para `./generated/prisma`, daí o `prisma:generate`.
 
 ## Scripts
 
