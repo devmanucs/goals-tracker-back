@@ -230,8 +230,20 @@ pnpm test    # vitest
 pnpm smoke   # sobe o servidor de verdade e bate no /health
 ```
 
-- `tests/unit/` — funções puras (streak, progresso, páginas lidas, datas, enums).
-  Não tocam no banco.
+São **234 testes**, em duas camadas:
+
+- `tests/unit/` — o que dá para exercitar sem banco:
+  - cálculos: streak nas três frequências, progresso de concurso, páginas lidas
+    por delta, séries da retrospectiva, datas e enums;
+  - `errorHandler.test.ts` — cada tipo de erro no formato combinado com o front,
+    e que um erro inesperado vira 500 genérico sem vazar a mensagem interna;
+  - `auth.middleware.test.ts` — header ausente, assinatura errada, token
+    expirado, token revogado por logout, e que **falha de banco na denylist vira
+    500, não 401** (senão um banco fora do ar deslogaria todo mundo);
+  - `catalogo.service.test.ts` — o cache (validade, normalização da chave,
+    404 lembrado) e o limite de 30 chamadas por minuto por usuário;
+  - `env.test.ts` — o processo morre com mensagem quando falta `JWT_SECRET`, e
+    exige segredo de 32+ caracteres em produção.
 - `tests/integracao/` — rotas de ponta a ponta com supertest, incluindo os testes
   de isolamento entre usuários.
 
