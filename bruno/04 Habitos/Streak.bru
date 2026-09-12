@@ -1,0 +1,15 @@
+meta {
+  name: Streak
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/habitos/{{habitoId}}/streak
+  body: none
+  auth: inherit
+}
+
+docs {
+  Periodos consecutivos que bateram a meta. O periodo vigente so soma quando ja bateu - nunca zera o streak enquanto esta em andamento.
+}

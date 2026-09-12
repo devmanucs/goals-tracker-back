@@ -1,0 +1,29 @@
+meta {
+  name: Criar topico
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/concursos/{{concursoId}}/topicos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titulo": "Atos administrativos",
+    "materia": "Direito Administrativo",
+    "peso": 10,
+    "dataAgendada": "2026-08-14",
+    "status": "pendente"
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("topicoId", res.body.id);
+}
+
+docs {
+  peso vai de 1 a 10. status: pendente | estudando | estudado | revisao.
+}

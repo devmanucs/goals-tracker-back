@@ -1,0 +1,20 @@
+meta {
+  name: Estatisticas
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/leitura/estatisticas
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~de: 2026-01-01
+  ~ate: 2026-12-31
+}
+
+docs {
+  Paginas lidas sao contadas por delta entre registros, nao pela pagina absoluta. Sem de/ate o periodo e a conta inteira.
+}

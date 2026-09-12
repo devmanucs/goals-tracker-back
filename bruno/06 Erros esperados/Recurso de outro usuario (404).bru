@@ -1,0 +1,15 @@
+meta {
+  name: Recurso de outro usuario (404)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/livros/id-que-nao-e-seu
+  body: none
+  auth: inherit
+}
+
+docs {
+  Recurso inexistente OU de outro usuario responde 404 - nunca 403, que confirmaria a existencia do id.
+}

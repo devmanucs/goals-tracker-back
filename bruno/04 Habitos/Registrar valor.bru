@@ -1,0 +1,26 @@
+meta {
+  name: Registrar valor
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/habitos/{{habitoId}}/registros
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "data": "2026-08-13",
+    "valor": 1.5
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("registroHabitoId", res.body.id);
+}
+
+docs {
+  Varios registros no mesmo dia sao permitidos e somam entre si.
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Me
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: inherit
+}
+
+docs {
+  Dados do usuario do token. 404 se a conta foi apagada e o token ainda vale.
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Sem token (401)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/livros
+  body: none
+  auth: none
+}
+
+docs {
+  Confere o 401 de rota protegida sem Authorization.
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Atualizar habito
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/habitos/{{habitoId}}
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "metaValor": 2.5
+  }
+}

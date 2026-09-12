@@ -1,0 +1,15 @@
+meta {
+  name: Health
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+docs {
+  Única rota sem token, junto com register e login. Use para conferir se o servidor subiu.
+}

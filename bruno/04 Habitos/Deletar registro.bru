@@ -1,0 +1,11 @@
+meta {
+  name: Deletar registro
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/registros-habito/{{registroHabitoId}}
+  body: none
+  auth: inherit
+}

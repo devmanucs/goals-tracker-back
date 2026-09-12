@@ -1,0 +1,20 @@
+meta {
+  name: Calendario do concurso
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/concursos/{{concursoId}}/calendario
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~de: 2026-08-01
+  ~ate: 2026-08-31
+}
+
+docs {
+  Lista ordenada de { data, total, topicos }, para a visao calendario.
+}

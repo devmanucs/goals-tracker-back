@@ -1,0 +1,15 @@
+meta {
+  name: Deletar habito
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/habitos/{{habitoId}}
+  body: none
+  auth: inherit
+}
+
+docs {
+  Remove os registros em cascata.
+}

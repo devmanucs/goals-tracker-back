@@ -1,0 +1,16 @@
+meta {
+  name: Listar registros
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/habitos/{{habitoId}}/registros
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~de: 2026-08-01
+  ~ate: 2026-08-31
+}

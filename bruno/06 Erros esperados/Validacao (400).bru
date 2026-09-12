@@ -1,0 +1,23 @@
+meta {
+  name: Validacao (400)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/livros
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titulo": "",
+    "autor": "X",
+    "totalPaginas": -5
+  }
+}
+
+docs {
+  Devolve { error: { message, code: 'VALIDACAO', issues: [{ campo, mensagem }] } }.
+}

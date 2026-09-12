@@ -1,0 +1,20 @@
+meta {
+  name: Calendario geral
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/estudos/calendario
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~de: 2026-08-01
+  ~ate: 2026-08-31
+}
+
+docs {
+  Mesma visao, atravessando todos os concursos do usuario.
+}

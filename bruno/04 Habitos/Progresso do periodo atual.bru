@@ -1,0 +1,15 @@
+meta {
+  name: Progresso do periodo atual
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/habitos/{{habitoId}}/progresso-atual
+  body: none
+  auth: inherit
+}
+
+docs {
+  Acumulado do periodo vigente: { inicio, fim, atual, meta, percentual, batido }.
+}

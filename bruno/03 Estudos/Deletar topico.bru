@@ -1,0 +1,11 @@
+meta {
+  name: Deletar topico
+  type: http
+  seq: 14
+}
+
+delete {
+  url: {{baseUrl}}/topicos/{{topicoId}}
+  body: none
+  auth: inherit
+}
