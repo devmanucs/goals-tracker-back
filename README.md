@@ -76,6 +76,8 @@ Tudo exige `Authorization: Bearer <token>`, exceto `/auth/*` e `/health`.
 |---|---|
 | GET/POST | `/livros` (GET aceita `?status=lendo`) |
 | GET/PATCH/DELETE | `/livros/:id` |
+| GET | `/livros/buscar-externo?q=&limite=` |
+| GET | `/livros/buscar-externo/detalhe?chave=` |
 | GET/POST | `/livros/:id/registros` |
 | PATCH/DELETE | `/registros-leitura/:id` |
 | GET | `/leitura/estatisticas?de=&ate=` |
@@ -108,6 +110,38 @@ Tudo exige `Authorization: Bearer <token>`, exceto `/auth/*` e `/health`.
 |---|---|
 | GET | `/dashboard` |
 | GET | `/retrospectiva?meses=6` |
+
+## Catálogo externo de livros
+
+`/livros/buscar-externo` é um proxy para a [Open Library](https://openlibrary.org),
+escolhida por ser aberta de verdade — não exige chave de API nem cadastro. A busca
+devolve o suficiente para escolher na lista (título, autor, páginas, capa, ano,
+ISBN); a sinopse vem no `/detalhe`, porque buscá-la para cada item da lista custaria
+uma requisição por resultado.
+
+O provedor fica atrás da interface `ProvedorDeCatalogo` (`catalogo.tipos.ts`):
+trocar por Google Books ou por um catálogo local é implementar a interface de novo,
+sem tocar no service, no controller nem no frontend.
+
+Três decisões que valem saber:
+
+- **Exige token**, apesar de ser só um proxy de busca. Sem isso qualquer um usaria
+  nosso servidor para consultar a Open Library em nome da nossa aplicação.
+- **Cache em memória** (1h para busca, 24h para detalhe, com teto de entradas) e
+  **limite de 30 buscas por minuto por usuário** — o alvo não é abuso, é um cliente
+  com bug disparando busca a cada tecla.
+- **Parsing tolerante**: é API pública de terceiro, pode mudar de formato ou omitir
+  campo. Na dúvida o campo vira `null` e o resto segue; resultado sem título ou sem
+  chave é descartado.
+
+```bash
+pnpm verificar:catalogo          # confere o normalizador contra a API real
+pnpm verificar:catalogo duna
+```
+
+Esse script existe porque os testes usam respostas montadas à mão: eles provam que
+campo faltando não derruba a busca, não que o formato real é aquele. Fica fora do
+CI de propósito — depende de rede e de serviço de terceiro.
 
 ## Logout
 

@@ -42,8 +42,19 @@ const camposLivro = z.object({
     .int("O total de páginas deve ser um número inteiro")
     .positive("O total de páginas deve ser maior que zero"),
   status: statusLivroApi,
-  // Cor usada pelo card do livro no frontend (ex: "var(--chart-3)").
+  // Cor de fundo do card, usada quando não há capa (ex: "var(--chart-3)").
   corCapa: z.string().max(60).optional(),
+
+  // Preenchidos pela busca externa; ausentes num cadastro feito na mão.
+  capaUrl: z.string().url("A URL da capa é inválida").max(500).optional(),
+  sinopse: z.string().max(5000).optional(),
+  isbn: z.string().max(20).optional(),
+  anoPublicacao: z
+    .number()
+    .int("O ano deve ser inteiro")
+    .min(1000, "Ano inválido")
+    .max(new Date().getFullYear() + 1, "Ano inválido")
+    .optional(),
 });
 
 export const criarLivroSchema = camposLivro.extend({

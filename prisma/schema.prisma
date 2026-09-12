@@ -57,8 +57,16 @@ model Livro {
   autor        String
   totalPaginas Int
   status       StatusLivro @default(QUERO_LER)
-  // Cor da capa usada pelos cards do frontend (ex: "var(--chart-3)").
+  // Cor de fundo do card, usada quando não há capa (ex: "var(--chart-3)").
   corCapa      String?
+
+  // Campos preenchidos pela busca externa de catálogo (Open Library). Todos
+  // opcionais: livro cadastrado na mão não tem nenhum deles.
+  capaUrl       String?
+  sinopse       String?
+  isbn          String?
+  anoPublicacao Int?
+
   createdAt    DateTime    @default(now())
 
   registros    RegistroLeitura[]

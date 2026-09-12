@@ -46,6 +46,10 @@ export const leituraRepository = {
     totalPaginas: number;
     status: StatusLivro;
     corCapa?: string;
+    capaUrl?: string;
+    sinopse?: string;
+    isbn?: string;
+    anoPublicacao?: number;
   }) {
     return prisma.livro.create({ data });
   },
@@ -58,6 +62,10 @@ export const leituraRepository = {
       totalPaginas?: number;
       status?: StatusLivro;
       corCapa?: string;
+      capaUrl?: string;
+      sinopse?: string;
+      isbn?: string;
+      anoPublicacao?: number;
     },
   ) {
     return prisma.livro.update({ where: { id }, data });

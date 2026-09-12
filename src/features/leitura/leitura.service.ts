@@ -33,6 +33,10 @@ export function serializarLivro(livro: LivroComUltimoRegistro) {
     totalPaginas: livro.totalPaginas,
     status: mapaStatusLivro.paraApi(livro.status),
     corCapa: livro.corCapa,
+    capaUrl: livro.capaUrl,
+    sinopse: livro.sinopse,
+    isbn: livro.isbn,
+    anoPublicacao: livro.anoPublicacao,
     createdAt: livro.createdAt.toISOString(),
     // Derivados do último registro: o frontend monta a barra de progresso do
     // card com isso, sem precisar buscar os registros de cada livro.
@@ -140,6 +144,12 @@ export const leituraService = {
       totalPaginas: dados.totalPaginas,
       status: mapaStatusLivro.paraDb(dados.status),
       ...(dados.corCapa !== undefined ? { corCapa: dados.corCapa } : {}),
+      ...(dados.capaUrl !== undefined ? { capaUrl: dados.capaUrl } : {}),
+      ...(dados.sinopse !== undefined ? { sinopse: dados.sinopse } : {}),
+      ...(dados.isbn !== undefined ? { isbn: dados.isbn } : {}),
+      ...(dados.anoPublicacao !== undefined
+        ? { anoPublicacao: dados.anoPublicacao }
+        : {}),
     });
     return serializarLivro(livro);
   },
@@ -155,6 +165,12 @@ export const leituraService = {
         ? { status: mapaStatusLivro.paraDb(dados.status) }
         : {}),
       ...(dados.corCapa !== undefined ? { corCapa: dados.corCapa } : {}),
+      ...(dados.capaUrl !== undefined ? { capaUrl: dados.capaUrl } : {}),
+      ...(dados.sinopse !== undefined ? { sinopse: dados.sinopse } : {}),
+      ...(dados.isbn !== undefined ? { isbn: dados.isbn } : {}),
+      ...(dados.anoPublicacao !== undefined
+        ? { anoPublicacao: dados.anoPublicacao }
+        : {}),
     });
     return serializarLivro(livro);
   },
